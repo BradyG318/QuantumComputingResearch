@@ -1,8 +1,5 @@
 #Var Dump (Copied from installation script)
-$installerPath = ".\Miniconda3-latest-Windows-x86_64.exe"
 $miniCondaPath = "$HOME\miniconda3"
-$condaExe = "$miniCondaPath\Scripts\conda.exe" #This pathing is necessary for compatibility
-$pythonVer = 3.11 #For modularities sake
 #Bools
 $vsIsInstalled = $false
 $condaIsInstalled = $false
