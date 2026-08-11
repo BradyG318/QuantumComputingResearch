@@ -15,7 +15,11 @@ If (Get-Command "code" -ErrorAction SilentlyContinue) {
 } Else {
     Write-Host "VSCode isn't installed." -ForegroundColor Red
     Write-Host "Beginning Installation..." -ForegroundColor Green
-    winget install -e --id Microsoft.VisualStudioCode #AI-Genned Line
+        #Install
+    Invoke-WebRequest -Uri "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64" -OutFile ".\VSCodeUserSetup.exe"
+    Start-Process -FilePath ".\VSCodeUserSetup.exe" -ArgumentList "/VERYSILENT", "/MERGETASKS=!runcode" -Wait
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User") #AI genned line
+    Write-Host "VSCode is installed." -ForegroundColor Green
 }
 Write-Host "VSCode connection established, proceeding" -ForegroundColor Green
 
@@ -63,4 +67,6 @@ cd ..
 Write-Host "Sucessfully installed conda, generated an environment, and booted VSCode" -ForegroundColor Green
 Write-Host "Cleaning up..." -ForegroundColor Green
 rm $installerPath
-Write-Host "Cleanup complete, Goodbye" -ForegroundColor Red
+rm ".\VSCodeUserSetup.exe"
+
+Write-Host "Cleanup complete" -ForegroundColor Red

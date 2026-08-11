@@ -25,6 +25,7 @@ if((Test-Path -path $miniCondaPath)) { #If no miniconda, mark bool
 
 #Run/Install
 if($vsIsInstalled -and $condaIsInstalled ) {
+    # FEATURE TO ADD: Ability to reset the virtual environment if all pieces are installed correctly
     Write-Host "Booting VSCode..." -ForegroundColor Red
     cd ".\PackageSet1"
     code -n "."
