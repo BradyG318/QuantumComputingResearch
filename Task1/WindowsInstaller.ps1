@@ -6,6 +6,9 @@ $miniCondaPath = "$HOME\miniconda3"
 $condaExe = "$miniCondaPath\Scripts\conda.exe" #This pathing is necessary for compatibility
 $pythonVer = 3.11 #For modularities sake
 
+#Preferences
+$ProgressPreference = 'SilentlyContinue' #As nice as the progress bar is, it is tanking the download speed, this changes download time from 20 minutes on a low end machine to ~1.5
+
 Write-Host "Please ignore all Powershell Pop-ups" -ForegroundColor Red
 
 #Software Setup
@@ -14,10 +17,11 @@ If (Get-Command "code" -ErrorAction SilentlyContinue) {
     Write-Host "VSCode is installed." -ForegroundColor Green
 } Else {
     Write-Host "VSCode isn't installed." -ForegroundColor Red
-    Write-Host "Beginning Installation..." -ForegroundColor Green
+    Write-Host "Beginning Download..." -ForegroundColor Green
         #Install
     Invoke-WebRequest -Uri "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64" -OutFile ".\VSCodeUserSetup.exe"
-    Start-Process -FilePath ".\VSCodeUserSetup.exe" -ArgumentList "/VERYSILENT", "/MERGETASKS=!runcode" -Wait
+    Write-Host "Installer download complete, beginning installation..." -ForegroundColor Green
+    Start-Process -FilePath ".\VSCodeUserSetup.exe" -ArgumentList "/SILENT", "/MERGETASKS=!runcode" -Wait
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User") #AI genned line
     Write-Host "VSCode is installed." -ForegroundColor Green
 }
