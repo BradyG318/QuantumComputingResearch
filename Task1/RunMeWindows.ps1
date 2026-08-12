@@ -12,10 +12,10 @@ Write-Host "Verifying Installation.." -ForegroundColor Green
 If (Get-Command "code" -ErrorAction SilentlyContinue) {
     Write-Host "VSCode is installed!" -ForegroundColor Green
     $vsIsInstalled = $true
+    Write-Host "VSCode connection established, proceeding" -ForegroundColor Green
 } Else {
     Write-Host "VSCode isn't installed" -ForegroundColor Red
 }
-Write-Host "VSCode connection established, proceeding" -ForegroundColor Green
 
     #Conda
 if((Test-Path -path $miniCondaPath)) { #If miniconda, mark bool

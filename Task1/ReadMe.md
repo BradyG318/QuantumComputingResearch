@@ -3,11 +3,13 @@
 ## Steps
 ### Step 1
 #### Powershell Scripts Pre-enabled
-If you've previously used a Powershell script, and have them enabled system-wide already, simply run the RunMeWindows.ps1 file, and the installation process will begin.
+If you've previously used a Powershell script, and have them enabled system-wide already, simply right click and run the RunMeWindows.ps1 file, and the installation process will begin.
 
 #### Powershell Scripts disabled
 If you have Powershell scripts disabled, you can either:
-A. Enable them by searching for Powershell in the taskbar, selecting "Run as Administrator", and inputting this command: *Set-ExecutionPolicy RemoteSigned*
+
+A. Enable them by searching for Powershell in the taskbar, selecting "Run as Administrator", and inputting this command: *Set-ExecutionPolicy RemoteSigned* then hit enter. After that, type (A) for "Yes to All"
+Once this change is made, revert to "Powershell Scripts Pre-enabled"
 
 B. Simply running the *RunMeScriptless.bat* file included in this package
 
