@@ -17,6 +17,24 @@ NC='\033[0m'
 #Preferences
 #(Silent/quiet download flags are passed directly to curl below instead of a global preference, as nice as the progress bar is, it is tanking the download speed)
 
+#Download helper - falls back to wget if curl isn't installed, and stops the script if the download actually fails #AI genned function
+download() {
+    local url="$1"
+    local out="$2"
+    if command -v curl &> /dev/null; then
+        curl -s -L -f "$url" -o "$out"
+    elif command -v wget &> /dev/null; then
+        wget -q "$url" -O "$out"
+    else
+        echo -e "${RED}Error: neither curl nor wget is installed. Please install one (e.g. brew install curl) and re-run this script${NC}"
+        exit 1
+    fi
+    if [ $? -ne 0 ] || [ ! -s "$out" ]; then
+        echo -e "${RED}Error: failed to download $url${NC}"
+        exit 1
+    fi
+}
+
 echo -e "${RED}Please ignore all terminal Pop-ups${NC}"
 
 #Software Setup
@@ -27,7 +45,7 @@ else
     echo -e "${RED}VSCode isn't installed.${NC}"
     echo -e "${GREEN}Beginning Download...${NC}"
         #Install
-    curl -s -L "https://code.visualstudio.com/sha/download?build=stable&os=darwin-universal" -o "./VSCodeUserSetup.zip"
+    download "https://code.visualstudio.com/sha/download?build=stable&os=darwin-universal" "./VSCodeUserSetup.zip"
     echo -e "${GREEN}Installer download complete, beginning installation...${NC}"
     unzip -q "./VSCodeUserSetup.zip" -d "./VSCodeUserSetup"
     mv "./VSCodeUserSetup/Visual Studio Code.app" "/Applications/Visual Studio Code.app"
@@ -41,9 +59,9 @@ echo -e "${GREEN}VSCode connection established, proceeding${NC}"
 if [ ! -f "$installerPath" ]; then #If the installer doesn't exist, install it
     echo -e "${GREEN}Downloading Miniconda installer...${NC}"
     if [ "$arch" == "arm64" ]; then #Apple Silicon
-        curl -s -L "https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-arm64.sh" -o "$installerPath"
+        download "https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-arm64.sh" "$installerPath"
     else #Intel
-        curl -s -L "https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh" -o "$installerPath"
+        download "https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh" "$installerPath"
     fi
 fi
 echo -e "${GREEN}Keeping all default configuration options within the MiniConda installer${NC}"
