@@ -6,7 +6,7 @@
 installerPath="./Miniconda3-latest-Linux-x86_64.sh"
 miniCondaPath="$HOME/miniconda3"
 condaExe="$miniCondaPath/bin/conda" #This pathing is necessary for compatibility
-pythonVer=3.12.11 #For modularities sake
+pythonVer=3.13 #For modularities sake
 
 #Colors
 RED='\033[0;31m'
@@ -94,12 +94,12 @@ while IFS= read -r extension; do code --install-extension "$extension"; done < v
 echo -e "${GREEN}Miniconda Initialized, Generating subdirectory${NC}"
 mkdir "PackageSet1"
 cd "./PackageSet1"
-"$condaExe" create --prefix "./.venv" python=$pythonVer --yes
+"$condaExe" create --prefix "./.venv" python=$pythonVer --solver=libmamba --yes
 if [ $? -ne 0 ]; then #AI genned check - stop if the environment itself couldn't be created
     echo -e "${RED}Error: failed to create the conda environment${NC}"
     exit 1
 fi
-"$condaExe" install --prefix "./.venv" --file "../packages.txt" --yes #--name removed, conda rejects --prefix and --name used together
+"$condaExe" install --prefix "./.venv" --file "../packages.txt" --solver=libmamba --yes #--name removed, conda rejects --prefix and --name used together
 if [ $? -ne 0 ]; then #AI genned check - stop if the packages failed to install
     echo -e "${RED}Error: failed to install packages into the conda environment${NC}"
     exit 1
