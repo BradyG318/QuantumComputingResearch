@@ -22,9 +22,9 @@ download() {
     local url="$1"
     local out="$2"
     if command -v curl &> /dev/null; then
-        curl -s -L -f "$url" -o "$out"
+        curl -s -L -f -A "Mozilla/5.0 (compatible; InstallerScript/1.0)" "$url" -o "$out" #Some CDNs 403 requests without a browser-like User-Agent
     elif command -v wget &> /dev/null; then
-        wget -q "$url" -O "$out"
+        wget -q --user-agent="Mozilla/5.0 (compatible; InstallerScript/1.0)" "$url" -O "$out"
     else
         echo -e "${RED}Error: neither curl nor wget is installed. Please install one (e.g. brew install curl) and re-run this script${NC}"
         exit 1
@@ -71,6 +71,12 @@ if [ ! -d "$miniCondaPath" ]; then #If you don't have miniconda, install it
 fi
 echo -e "${RED}Do not restart the terminal${NC}"
 
+#Sanity check - if the Miniconda installer didn't actually succeed (e.g. ran out of disk space), stop here instead of continuing on a broken install #AI genned check
+if [ ! -x "$condaExe" ]; then
+    echo -e "${RED}Error: Miniconda installation failed - $condaExe was not created. Check the installer output above (e.g. disk space) and re-run this script${NC}"
+    exit 1
+fi
+
 #Conda Initialization
 echo -e "${GREEN}Sucessfully setup MiniConda... Initializing to Zsh${NC}"
 "$condaExe" init zsh #Zsh is the default shell on macOS
@@ -91,7 +97,15 @@ echo -e "${GREEN}Miniconda Initialized, Generating subdirectory${NC}"
 mkdir "PackageSet1"
 cd "./PackageSet1"
 "$condaExe" create --prefix "./.venv" python=$pythonVer --yes
-"$condaExe" install --prefix "./.venv" --file "../packages.txt" --name PackageSet1 --yes
+if [ $? -ne 0 ]; then #AI genned check - stop if the environment itself couldn't be created
+    echo -e "${RED}Error: failed to create the conda environment${NC}"
+    exit 1
+fi
+"$condaExe" install --prefix "./.venv" --file "../packages.txt" --yes #--name removed, conda rejects --prefix and --name used together
+if [ $? -ne 0 ]; then #AI genned check - stop if the packages failed to install
+    echo -e "${RED}Error: failed to install packages into the conda environment${NC}"
+    exit 1
+fi
 
 #VSCode Setup
 mkdir "./.vscode"
