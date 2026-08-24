@@ -4,7 +4,7 @@
 $installerPath = ".\Miniconda3-latest-Windows-x86_64.exe"
 $miniCondaPath = "$HOME\miniconda3"
 $condaExe = "$miniCondaPath\Scripts\conda.exe" #This pathing is necessary for compatibility
-$pythonVer = 3.13 #For modularities sake
+$pythonVer = 3.12.11 #For modularities sake
 
 #Preferences
 $ProgressPreference = 'SilentlyContinue' #As nice as the progress bar is, it is tanking the download speed, this changes download time from 20 minutes on a low end machine to ~1.5

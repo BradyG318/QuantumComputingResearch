@@ -6,7 +6,7 @@
 installerPath="./Miniconda3-latest-Linux-x86_64.sh"
 miniCondaPath="$HOME/miniconda3"
 condaExe="$miniCondaPath/bin/conda" #This pathing is necessary for compatibility
-pythonVer=3.13 #For modularities sake
+pythonVer=3.12.11 #For modularities sake
 
 #Colors
 RED='\033[0;31m'
