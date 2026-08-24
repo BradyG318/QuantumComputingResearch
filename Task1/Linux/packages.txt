@@ -60,7 +60,6 @@ babel==2.17.0
 bleach==6.2.0
 botocore==1.37.3
 cachetools==5.5.2
-certifi==2024.7.4
 cffi==1.17.1
 charset-normalizer==3.4.2
 click==8.2.1

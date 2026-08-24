@@ -4,7 +4,7 @@
 $installerPath = ".\Miniconda3-latest-Windows-x86_64.exe"
 $miniCondaPath = "$HOME\miniconda3"
 $condaExe = "$miniCondaPath\Scripts\conda.exe" #This pathing is necessary for compatibility
-$pythonVer = 3.13 #For modularities sake
+$pythonVer = "3.11" #For modularities sake
 $downloadUserAgent = "Mozilla/5.0 (compatible; InstallerScript/1.0)" #Some CDNs 403 requests without a browser-like User-Agent #AI genned line
 
 #Preferences
@@ -69,16 +69,34 @@ Get-Content vsExtensions.txt | ForEach-Object { code --install-extension $_ } #A
 Write-Host "Miniconda Initialized, Generating subdirectory" -ForegroundColor Green
 mkdir "PackageSet1"
 cd ".\PackageSet1"
-& $condaExe create --prefix ".\.venv" python=$pythonVer --solver=libmamba --yes
+& $condaExe create --prefix ".\.venv" python=$pythonVer pip --solver=libmamba --yes
 if ($LASTEXITCODE -ne 0) { #AI genned check - stop if the environment itself couldn't be created
     Write-Host "Error: failed to create the conda environment" -ForegroundColor Red
     exit 1
 }
-& $condaExe install --prefix ".\.venv" --file "..\packages.txt" --solver=libmamba --yes #--name removed, conda rejects --prefix and --name used together
+
+#Mayavi/VTK - installed from conda-forge as prebuilt binaries, NOT via pip #AI genned block
+#pip has to build mayavi==4.8.3 from source on Windows, which runs mayavi's TVTK code generator against
+#the installed VTK. Against vtk 9.3.x/9.4.x that generator calls a getter on vtkUniformHyperTreeGrid
+#before it's safe to, which segfaults (shows up here as "Windows fatal exception: access violation").
+#This is a known upstream bug (enthought/mayavi issues #1324, #1328, #1345), not something specific to
+#this machine. conda-forge ships mayavi as an already-built binary, so it never runs that step.
+Write-Host "Installing mayavi/vtk via conda-forge (avoids a known pip build crash on Windows)..." -ForegroundColor Green
+& $condaExe install --prefix ".\.venv" -c conda-forge mayavi vtk --solver=libmamba --yes
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Error: failed to install mayavi/vtk via conda-forge" -ForegroundColor Red
+    exit 1
+}
+
+#Remaining packages via pip - mayavi/vtk lines are stripped out first so pip doesn't try to rebuild
+#them from source and overwrite the working conda-forge install above #AI genned line
+Get-Content "..\packages.txt" | Where-Object { $_ -notmatch '^(mayavi|vtk)==' } | Set-Content ".\packages_filtered.txt"
+& ".\.venv\python.exe" -m pip install -r ".\packages_filtered.txt" #Switched from `conda install --file` to pip - packages.txt is pip-format (==) and conda's solver was choking trying to SAT-solve 200+ pinned packages against the defaults channel, spiking CPU/RAM and crashing with "bad variant access" #--name removed, conda rejects --prefix and --name used together
 if ($LASTEXITCODE -ne 0) { #AI genned check - stop if the packages failed to install
     Write-Host "Error: failed to install packages into the conda environment" -ForegroundColor Red
     exit 1
 }
+Remove-Item ".\packages_filtered.txt" #AI genned line - tidy up the temp file
 
 #VSCode Setup
 mkdir ".\.vscode"
