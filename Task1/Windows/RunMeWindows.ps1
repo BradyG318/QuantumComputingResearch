@@ -1,5 +1,5 @@
 #Var Dump (Copied from installation script)
-$miniCondaPath = "$HOME\miniconda3"
+$miniCondaPath = "C:\miniconda3" #Must match WindowsInstaller.ps1's install location exactly #AI genned fix
 $venvPath = ".\PackageSet1\.venv"
 #Bools
 $vsIsInstalled = $false

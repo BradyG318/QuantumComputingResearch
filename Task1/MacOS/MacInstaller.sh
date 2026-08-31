@@ -101,11 +101,19 @@ if [ $? -ne 0 ]; then #AI genned check - stop if the environment itself couldn't
     echo -e "${RED}Error: failed to create the conda environment${NC}"
     exit 1
 fi
-"./.venv/bin/python" -m pip install -r "../packages.txt" #Switched from `conda install --file` to pip - packages.txt is pip-format (==) and conda's solver was choking trying to SAT-solve 200+ pinned packages against the defaults channel, spiking CPU/RAM and crashing with "bad variant access" #--name removed, conda rejects --prefix and --name used together
+#mayavi has no prebuilt wheel on PyPI - pip falls back to building it from source, and that build's VTK introspection step segfaults. conda-forge ships a working prebuilt binary instead, so pull it from there separately #AI genned fix
+"$condaExe" install --prefix "./.venv" --override-channels -c conda-forge mayavi --solver=libmamba --yes
+if [ $? -ne 0 ]; then #AI genned check - stop if mayavi failed to install from conda-forge
+    echo -e "${RED}Error: failed to install mayavi from conda-forge${NC}"
+    exit 1
+fi
+grep -viE '^mayavi([=<>~!\[]|$)' "../packages.txt" > "./pip_packages.txt" #Excludes mayavi - already installed via conda above, letting pip touch it again would hit the same segfault #AI genned line
+"./.venv/bin/python" -m pip install -r "./pip_packages.txt" #Switched from `conda install --file` to pip - packages.txt is pip-format (==) and conda's solver was choking trying to SAT-solve 200+ pinned packages against the defaults channel, spiking CPU/RAM and crashing with "bad variant access" #--name removed, conda rejects --prefix and --name used together
 if [ $? -ne 0 ]; then #AI genned check - stop if the packages failed to install
     echo -e "${RED}Error: failed to install packages into the conda environment${NC}"
     exit 1
 fi
+rm "./pip_packages.txt" #AI genned line - cleanup the filtered temp file
 
 #VSCode Setup
 mkdir "./.vscode"

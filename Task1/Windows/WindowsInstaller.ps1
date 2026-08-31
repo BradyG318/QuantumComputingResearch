@@ -2,7 +2,7 @@
 
 #Var Dump
 $installerPath = ".\Miniconda3-latest-Windows-x86_64.exe"
-$miniCondaPath = "$HOME\miniconda3"
+$miniCondaPath = "C:\miniconda3" #Fixed, space-free path - NOT $HOME\miniconda3. conda's own conda.exe launcher shim builds its internal "python.exe ... conda-script.py" call as a raw, unquoted string; if the install path contains a space (e.g. a Windows username like "The Dean"), that shim breaks with "Unable to create process using...". This is a known, longstanding conda/distlib launcher bug, not something fixable from our side of the call - avoiding a space in the install path entirely is the standard workaround #AI genned fix
 $condaExe = "$miniCondaPath\Scripts\conda.exe" #This pathing is necessary for compatibility
 $pythonVer = "3.11" #For modularities sake
 $downloadUserAgent = "Mozilla/5.0 (compatible; InstallerScript/1.0)" #Some CDNs 403 requests without a browser-like User-Agent #AI genned line
@@ -67,7 +67,7 @@ Get-Content vsExtensions.txt | ForEach-Object { code --install-extension $_ } #A
 
 #Dir Setup
 Write-Host "Miniconda Initialized, Generating subdirectory" -ForegroundColor Green
-mkdir "PackageSet1"
+mkdir "PackageSet1" -Force #-Force so re-running the script after a failure doesn't hard-error on an already-existing folder #AI genned line
 cd ".\PackageSet1"
 & $condaExe create --prefix ".\.venv" python=$pythonVer pip --solver=libmamba --yes
 if ($LASTEXITCODE -ne 0) { #AI genned check - stop if the environment itself couldn't be created
@@ -99,7 +99,7 @@ if ($LASTEXITCODE -ne 0) { #AI genned check - stop if the packages failed to ins
 Remove-Item ".\packages_filtered.txt" #AI genned line - tidy up the temp file
 
 #VSCode Setup
-mkdir ".\.vscode"
+mkdir ".\.vscode" -Force #AI genned line - same re-run safety as above
 Copy-Item -Path "..\settings.json" -Destination ".\.vscode" 
 code -n "."
 
